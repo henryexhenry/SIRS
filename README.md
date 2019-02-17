@@ -7,12 +7,12 @@
 
 ### 2. remove stopwords
 - read stopword file
-- create keyword list without stopwords and duplicates
-- sort keyword list alphabetically
+- create term list without stopwords and duplicates
+- sort term list alphabetically
 
 ### 3. indexing with term frequency
 - create a 2d list as Term-Document Matrix(TDM) to store the term frequency (tf) within each doc. 
-- compare keyword list with docs, mark the tf into TDM.
+- compare term list with docs, mark the tf into TDM.
 
 ### 4. Searching
 - user gives a query
