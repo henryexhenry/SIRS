@@ -57,3 +57,29 @@ def createTermList(docList): # ([][]) -> []
     termList.sort()
 
     return termList
+
+def createTDM(termList, detailDocList): # ([7000], [200][*]) -> [7000][200]
+    ltl = len(termList)
+    lddl = len(detailDocList)
+    TDM = [[0 for _ in range(lddl)] for _ in range(ltl)]
+
+    for d, doc in enumerate(detailDocList):
+        for term in doc:
+            if term in termList:
+                t = termList.index(term)
+                TDM[t][d] += 1
+
+    return TDM
+
+def findDocsByQuery(query, TDM, termList, detailDocList):
+
+    resultList = []
+
+    if query in termList:
+        t = termList.index(query)
+
+        for d, f in enumerate(TDM[t]):
+            if f > 0:
+                resultList.append([d, f])
+
+    return sorted(resultList, key=lambda l:l[1], reverse=True)
