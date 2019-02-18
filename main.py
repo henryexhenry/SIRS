@@ -1,31 +1,57 @@
 import string
+import sys
 from os import listdir
 from indexingModules import preprocess, createDetailDocsList, createTermList, createTDM, findDocsByQuery
 
-DIRC = 'data/'
-DOC = 'data/D0601.M.250.A.A'
 SWFile = 'english-stop.txt'
 TDM = []
-QUERY = 'unhappy'
 resultList = []
 
-with open(SWFile) as f1:
-    SW = f1.read()
-f1.close()
-SW = SW.split()
+# check command line argument
+if len(sys.argv) != 2:
+    print('Usage: main.py <directory of documents>')
+else:
+    DIRC = sys.argv[1]
+    # check directory format
+    if DIRC[-1] != '/':
+        DIRC += '/'
 
-detailDocList = createDetailDocsList(DIRC, SW)
+    FNames = listdir(DIRC)
 
-termList = createTermList(detailDocList)
-print(termList)
-# [Done] exited with code=0 in 0.475 seconds
-# Total 7217 terms
-# Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
+    # open stop word file
+    with open(SWFile) as f1:
+        SW = f1.read()
+    f1.close()
+    SW = SW.split()
 
-TDM = createTDM(termList, detailDocList)
-for i in range(5):
-    print(TDM[i])
-# [Done] exited with code=0 in 4.937 seconds
-# Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
+    # create [list of term] for each doc for a directory
+    detailDocList = createDetailDocsList(DIRC, SW)
 
-#print(findDocsByQuery(QUERY, TDM, termList, detailDocList))
+    # create a list to store all the terms
+    termList = createTermList(detailDocList)
+
+    # [Done] exited with code=0 in 0.475 seconds
+    # Total 7217 terms
+    # Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
+
+    # create a 2d list for Term-Document Matrix(TDM)
+    TDM = createTDM(termList, detailDocList)
+    # [Done] exited with code=0 in 4.937 seconds
+    # Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
+
+    # loop for asking query.
+    while True:
+        query = input('Query : ')
+
+        # search docs by query, return a list of docs sorted by term frequency.
+        results = findDocsByQuery(query, TDM, termList, detailDocList)
+        if results == []:
+            print('The query is not relevant to any document.')
+        else:
+            print('Results are ranked by term frequency.')
+            print(results)
+
+            # print document names that relevant to the query.
+            for result in results:
+                print('File : '+FNames[result[0]]+', TF : '+str(result[1]))
+
