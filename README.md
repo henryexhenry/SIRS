@@ -30,7 +30,7 @@
 ### 2. Query to search.
 You will be continuesly asked for a query.
 
-To exit, press ```ctrl + z``` and ```enter```.
+To exit, press ```ctrl + c``` and ```enter```.
 
 ## Modules used
 - string
