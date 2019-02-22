@@ -1,7 +1,7 @@
 import string, time
 import sys
 from os import listdir
-from indexingModules import preprocess, createDetailDocsList, createTermList, createTDM, findDocsByQuery, ceatePostingList
+from indexingModules import preprocess, createDetailDocsList, createTermList, createTDM, findDocsByQuery
 
 SWFile = 'english-stop.txt'
 TDM = []
@@ -16,15 +16,16 @@ else:
     if DIRC[-1] != '/':
         DIRC += '/'
 
+    # get document names in the folder
     FNames = listdir(DIRC)
 
-    # open stop word file
+    # read stop word file
     with open(SWFile) as f1:
         SW = f1.read()
     f1.close()
     SW = SW.split()
 
-    # create [list of term] for each doc for a directory
+    # create [list of term] for each doc in the directory
     detailDocList = createDetailDocsList(DIRC, SW)
 
     # create a list to store all the terms
@@ -33,54 +34,34 @@ else:
     # [Done] exited with code=0 in 0.475 seconds
     # Total 7217 terms
     # Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
-
-    s = time.time()
-    postingList = ceatePostingList(termList, detailDocList)
-    e = time.time()
-
-    '''                 TDM
+  
+    '''                 TDM                 '''
 
     # create a 2d list for Term-Document Matrix(TDM)
 
     start = time.time()
-    TDM = createTDM(termList, detailDocList)
+    VSM = createTDM(termList, detailDocList)
     end = time.time()
 
-    print('Time for creating TDM: ', end-start)
+    print('TDM is successfully created using %.2f s' % (end-start))
     # [Done] exited with code=0 in 4.937 seconds
-    # Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
-    '''
+    # Size of TDM  = 200 * 7217 ~= 1,400,000 
+    
 
-    print('Time for creating postingList: ', e-s)
     # loop for asking query.
     while True:
         query = input('Query : ')
+        if not query:
+            continue 
 
         # search docs by query, return a list of docs sorted by term frequency.
-        results = findDocsByQuery(query, termList, detailDocList, postingList)
+        results = findDocsByQuery(query, termList, detailDocList, VSM)
         if results == [] or results == 0:
             print('Cannot find any relevant document.')
         else:
-            print('Results are ranked by term frequency.')
-            print(results)
+            print('Results are ranked by tf-idf weight.')
 
             # print document names that relevant to the query.
             for result in results:
-                print('File : '+FNames[result[0]]+', TF : '+str(result[1]))
-
-
-
-'''
-c=0
-postingList = termList
-for term in postingList:
-    node = term.head.next
-    while node :
-        print('fname : '+FNames[node.docId]+', Weight: ', node.weight )
-        node = node.next
-        c+=1
-'''
-# total 21212 nodes stored in posting list
-# each node has docId and weight and address
-# 7000 PostingList objects, each of them has term and length and 2 address
-# 20000*3+7000*4 = 60000+28000 = 88000
+                print('File : '+FNames[result[0]]+', Weight : '+str(result[1]))
+        print('[Done] We found ', len(results), ' result' + 's'*(len(result)>1) + ' in the collection.\n')

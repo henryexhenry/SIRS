@@ -94,83 +94,62 @@ def createTDM(termList, detailDocList):
 
 # search docs by query, return a list of docs sorted by term frequency.
 # VSM for vector space model
-# (str, [][], [], [][]) -> [][]
+# (str, [], [][], [][]/[]) -> []
 def findDocsByQuery(query, termList, detailDocList, VSM):
     resultList = []
-    if query in termList:
-        t = termList.index(query)
-    
-        if type(VSM[0]) == list:
-            # TDM approach
-            for d, f in enumerate(VSM[t]):
-                if f > 0:
-                    resultList.append([d, f])
+    query = query.lower()
+    queries = [query]
 
-        else:
-            # Linked list approach
-            node = VSM[t].head.next
-            print(node)
-            while node:
-                resultList.append([node.docId, node.weight])
-                print([node.docId, node.weight])
-                node = node.next
+    # composit query with AND operation
+    if ' and ' in query.lower():
 
+        queries = query.split(' and ')
+        t_idxs = []
+
+        # find document ids which include query terms
+        # store document ids into set()
+        for q, query_ in enumerate(queries):
+            if query_ in termList:
+                t_idx = termList.index(query_)
+                t_idxs.append(t_idx)
+                resultList.append(set())
+                for d, w in enumerate(VSM[t_idx]):
+                    if w > 0:
+                        resultList[q].add(d)
+        temp = resultList[0]
+
+        # find common document ids by intersect operation
+        for d in range(len(resultList)):
+            temp &= resultList[d]
+
+        temp = list(temp)
+
+        # find weights accroding to doc ids.
+        resultList = []
+
+        for d in temp:
+            sum_w = 0
+            for q in t_idxs:
+                sum_w += VSM[q][d]
+            resultList.append([d, sum_w])
+
+        # return [docid, weight] list sorted by weight
         return sorted(resultList, key=lambda l:l[1], reverse=True)
-    return 0
 
-class Node:
-    def __init__(self, docId, weight=None):
-        self.docId = docId
-        self.weight = weight
-        self.next = None # the pointer initially points to nothing
 
-class PostingList:
-    def __init__(self, head):
-        self.term = head
-        self.length = 0
-        self.head = Node(head)
-        self.end = self.head
-    
-    def addNode(self, docId, weight):
-        self.end.next = Node(docId, weight)
-        self.end = self.end.next
-        self.length += 1
-    
-    def search(self):
-        result = []
-        curr = self.head.next
-        if curr.weight > 0:
-            result.append((curr.docId, curr.weight))
-        return result
-        '''
-termList = ['aba', 'abandon', 'abc']
-j=0
-k=13
-for i in range(len(termList)):
-    j+=1
-    k+=1
-    termList[i] = PostingList(i)
-    termList[i].addNode(j, k)
-    print(termList[i].search())'''
+    elif ' or ' in query.lower():
+        queries = query.split(' or ')
 
-def ceatePostingList(termList, detailDocList):
-    N = len(termList)
-    postingList = [0 for _ in range(N)]
-
-    for i in range(len(termList)):
-        postingList[i] = PostingList(termList[i])
-        df=0
-
-        for doc in detailDocList:
-            if termList[i] in doc:
-                df+=1
-
-        for j, doc in enumerate(detailDocList):
-            if termList[i] in doc:
-
-                tf = doc.count(termList[i])
-                ifd = math.log(N/df, 10)
-                w = tf*ifd
+    # OR operation : search each query term one-by-one and append them into result list
+    for query in queries:
+        if query in termList:
+            t = termList.index(query)
+            for d, w in enumerate(VSM[t]):
                 if w > 0:
-                    postingList[i].addNode(j, w)
-    return postingList
+                    resultList.append([d, w])
+        else:
+            return 0
+    return sorted(resultList, key=lambda l:l[1], reverse=True)
+
+
+
