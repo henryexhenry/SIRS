@@ -1,5 +1,5 @@
-# A Simple Index and Query System
-## System workflow
+# A Simple Information Retrieval System
+## Indexing
 ### 1. preprocessing docs
 - read docs from doc directory
 - preprocessing docs
@@ -18,14 +18,14 @@
 - create a 2d list as Term-Document Matrix(TDM) to store the term tf-idf weight within each doc
 - compare term list with docs, mark the weight into TDM
 
-### 4. Searching
-- single query
-    - user gives a query
+## Searching
+- **single query**
+    - findDocsByQuery() function in indexingModules_LL.py file.
     - start searching the doc which has non-zero weight for the query
     - print out the relevant doc names ranked by weights
-- multiple query 
-    - user gives queries
-    - search the doc which has non-zero weight for each query
+- **composite query**
+    - findDocsByQueries() function in indexingModules_LL.py file.
+    - search the docs which has non-zero weight for each query
     - compute weight of all queries for each doc
         - 'AND' operation
             - apply intersect operation to the set of doc weight for each query for finding common docs
@@ -33,17 +33,31 @@
         - 'OR' operation
             - perform single query search for each query
     - print out the relevant doc names ranked by weights
+- **phrase query**
+    - findDocByPhrase() function in indexingModules_LL.py file.
+    - Compare the linked list of each word.
+    - Find common documents.
+    - Compare two position lists in two linked list from the doc.
+    - Find doc with position difference in 1.  
 
-## Usage:
+
+## Usages (Two choises of interface):
+### - **Dos interface:**
 ### 1. Document directory is needed.
 Document directory is the folder which you store the documents you are going to index.
-```
-> python main.py <doc directory>
-```
-### 2. Query to search.
-You will be continuously asked for a query.
+- For the Linked list approach:
+    ```
+    > python main_LL.py <doc directory>
+    ```
+- Or for the 2-d list approach:
+    ```
+    > python main_2dL.py <doc directory>
+    ```
 
-To exit, press ```ctrl + c``` and ```enter```.
+### 2. Query to search.
+You can now search documents by your queries iteratively.
+
+To exit, press ```q``` and hit ```enter```.
 
 ## Modules used
 - string
@@ -51,3 +65,28 @@ To exit, press ```ctrl + c``` and ```enter```.
 - time
 - sys
 - os
+
+### - **Kivy interface:**
+### 1. Install Kivy
+- 1. Ensure you have the latest pip and wheel:
+    ```
+    python -m pip install --upgrade pip wheel setuptools
+    ```
+- 2. Install the dependencie
+    ```
+    python -m pip install docutils pygments pypiwin32 kivy.deps.sdl2 kivy.deps.glew
+    ```
+- 3. Install kivy:
+    ```
+    python -m pip install kivy
+    ```
+### 2. Run the program
+- start running the script
+    ```
+    python IRsystem.py
+    ```
+- Click the ```Index``` button for indexing the document in the directory.
+
+- Input query in the ```query``` text space and click ```Search```.
+
+- Select result and hit ```Full text``` for full text of the selected document.

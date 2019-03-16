@@ -1,0 +1,92 @@
+# Reference IRsystem.py
+#: import main IRsystem
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+ 
+
+IRsystem:
+ 
+<IRsystem>:
+    orientation: "vertical"
+
+    directory: dir
+    query: query
+    result_list: result_list_view
+    message: message_view
+    content: content
+
+    padding: 10
+    spacing: 10
+ 
+# *****************************  input  ****************************
+
+    BoxLayout:
+        size_hint_y: None
+        height: "30dp"
+
+        Label:
+            size_hint_x: 2
+            text: "We show Top 9 results with highest similarity."
+ 
+        Label:
+            text: "Documents Directoy:"
+        TextInput:
+            id: dir
+            text: 'data/' 
+             
+    BoxLayout:
+        size_hint_y: None
+        height: "30dp"
+
+        Button:
+            size_hint_x: 2
+            text: "Index"
+            on_release: root.index_IRsystem()
+
+        Label:
+            text: "Query: "
+        TextInput:
+            id: query
+            text: ''
+
+# *******************************  Button *****************************
+
+    BoxLayout:
+        size_hint_y: None
+        height: "30dp"
+
+        Button:
+            size_hint_x: 1
+            text: "Full text"
+            on_release: root.full_text_IRsystem()
+        
+        Button:
+            size_hint_x: 1
+            text: "Search"
+            on_press: root.search_IRsystem()
+
+#  *****************************  List view  ****************************
+    # Define starting data and point to the ListItemButton
+    # in the Python code
+
+    BoxLayout:
+        orientation: "horizontal"
+
+        ListView:
+            id: message_view
+            adapter:
+                ListAdapter(data=["-"], cls=main.IRsystemListButton)
+        ListView:
+            id: result_list_view
+            adapter:
+                ListAdapter(data=["-"], cls=main.IRsystemListButton)
+    
+ #  *****************************  Panel  ****************************
+    BoxLayout:
+
+
+        TextInput:
+            id: content
+            adapter:
+                ListAdapter(data=["-"], cls=main.IRsystemPanel)
+            text: content.adapter.data[0]

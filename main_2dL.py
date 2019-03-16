@@ -30,7 +30,7 @@ else:
 
     # create a list to store all the terms
     termList = createTermList(detailDocList)
-
+    
     # [Done] exited with code=0 in 0.475 seconds
     # Total 7217 terms
     # Size of TDM  = 200 * 7217 ~= 1,400,000 (one million) 
@@ -51,6 +51,9 @@ else:
     # loop for asking query.
     while True:
         query = input('Query : ')
+        
+        if query == 'q':
+            break
         if not query:
             continue 
 
